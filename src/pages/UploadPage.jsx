@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import MenuButton from '../components/MenuButton';
+import useGlobalStore from "../zustand/store";
 
 const UploadPage = () => {
+  
+  const {setVideo,setVideoName} = useGlobalStore();
+
   const [videoFile, setVideoFile] = useState(null);
   const navigate = useNavigate();
   const [file, setFile] = useState("Click here to upload or drop media here");
@@ -11,7 +15,9 @@ const UploadPage = () => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("video/")) {
       setFile(file.name);
+      setVideoName(file.name);
       setVideoFile(URL.createObjectURL(file));
+      setVideo(URL.createObjectURL(file));
     } else {
       setFile("Click here to upload or drop media here");
       alert("Please select a valid video file");
@@ -20,7 +26,8 @@ const UploadPage = () => {
 
   const handleUpload = () => {
     if (videoFile) {
-      navigate("/Result", { state: { videoFile } });
+      // navigate("/Result", { state: { videoFile } });
+      navigate("/Editor");
     } else {
       alert("Please upload a video before proceeding");
     }

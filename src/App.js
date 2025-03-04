@@ -12,17 +12,17 @@ function App() {
     <Router>
       <div>
         <Routes>
-          {/* <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/Auth" element={<AuthPage />} />
           <Route path="/Upload" element={<UploadPage />} />
           <Route path="/Result" element={<ResultPage />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Editor" element={<Editor />} />
           <Route path="*" element={<LandingPage />} /> 
-          */}
+         
 
-          <Route path="/" element={<Editor />} />
-          <Route path="*" element={<Editor />} />
+          {/* <Route path="/" element={<Editor />} />
+          <Route path="*" element={<Editor />} /> */}
         </Routes>
       </div>
     </Router>

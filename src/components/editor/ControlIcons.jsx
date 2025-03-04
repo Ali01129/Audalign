@@ -71,3 +71,30 @@ export function ExpandIcon({ className }) {
 }
 
 // More icons can be added similarly...
+
+export function PlayIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none">
+      <path d="M7 4V20L19 12L7 4Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function PauseIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none">
+      <path d="M6 4H10V20H6V4ZM14 4H18V20H14V4Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function ResetIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M12 5V2L8 6L12 10V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
