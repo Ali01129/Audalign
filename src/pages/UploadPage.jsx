@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import MenuButton from '../components/MenuButton';
 import useGlobalStore from "../zustand/store";
+import axios from 'axios';
 
 const UploadPage = () => {
   
@@ -10,9 +11,11 @@ const UploadPage = () => {
   const [videoFile, setVideoFile] = useState(null);
   const navigate = useNavigate();
   const [file, setFile] = useState("Click here to upload or drop media here");
+  const [vid,setVid] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    setVid(file);
     if (file && file.type.startsWith("video/")) {
       setFile(file.name);
       setVideoName(file.name);
@@ -27,6 +30,23 @@ const UploadPage = () => {
   const handleUpload = () => {
     if (videoFile) {
       // navigate("/Result", { state: { videoFile } });
+
+      // sending the video to server
+      const formData = new FormData();
+      formData.append('video', vid);
+      axios.post('http://127.0.0.1:5000/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then(response => {
+        console.log('Success:', response.data);
+      })
+      .catch(error => {
+        console.error('Error uploading video:', error);
+      });
+
+      // sending to server done
       navigate("/Editor");
     } else {
       alert("Please upload a video before proceeding");
