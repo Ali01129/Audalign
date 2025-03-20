@@ -53,7 +53,7 @@ export default function AudioControls() {
       {navPressed === "Controls" && (
         <>
           <button className="p-3 mb-4 text-base font-semibold text-center text-black bg-lime-300 rounded-lg w-fit ml-auto" onClick={RevertButton}>
-            Revert
+            Revert to Original
           </button>
 
           <div className="flex flex-col gap-4">

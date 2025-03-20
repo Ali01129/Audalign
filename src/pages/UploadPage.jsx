@@ -5,13 +5,14 @@ import useGlobalStore from "../zustand/store";
 import axios from 'axios';
 
 const UploadPage = () => {
-  
-  const {setVideo,setVideoName} = useGlobalStore();
+
+  const { setVideo, setVideoName } = useGlobalStore();
 
   const [videoFile, setVideoFile] = useState(null);
   const navigate = useNavigate();
   const [file, setFile] = useState("Click here to upload or drop media here");
-  const [vid,setVid] = useState(null);
+  const [vid, setVid] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -27,27 +28,29 @@ const UploadPage = () => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (videoFile) {
-      // navigate("/Result", { state: { videoFile } });
+      try {
+        setLoading(true);
 
-      // sending the video to server
-      const formData = new FormData();
-      formData.append('video', vid);
-      axios.post('http://127.0.0.1:5000/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then(response => {
-        console.log('Success:', response.data);
-      })
-      .catch(error => {
-        console.error('Error uploading video:', error);
-      });
+        const formData = new FormData();
+        formData.append('video', vid);
 
-      // sending to server done
-      navigate("/Editor");
+        const response = await axios.post("http://127.0.0.1:5000/upload", formData, {
+          responseType: "blob",
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+
+        const videoUrl = URL.createObjectURL(response.data);
+        setVideo(videoUrl);
+
+        navigate("/Editor");
+      } catch (error) {
+        console.error("Error uploading video:", error);
+        alert("Failed to upload video. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     } else {
       alert("Please upload a video before proceeding");
     }
@@ -58,7 +61,7 @@ const UploadPage = () => {
       <div className='p-10'>
         <MenuButton />
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-[90%] max-w-4xl bg-[#0A192F] rounded-lg p-6">
@@ -70,7 +73,7 @@ const UploadPage = () => {
               type="file"
               id="file-upload"
               className="hidden"
-              accept="video/mp4,video/mkv,video/webm" // Allow more video formats
+              accept="video/mp4,video/mkv,video/webm"
               onChange={handleFileChange}
             />
             <label
@@ -95,9 +98,10 @@ const UploadPage = () => {
           <div className="bg-white rounded-lg mt-4 p-3 text-center">
             <div className="flex justify-between">
               {/* Previous Button */}
-              <button 
+              <button
                 className="bg-[#D0FF71] text-black px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#D0FF20] active:scale-95 transition-transform duration-150"
-                onClick={() => {navigate('/')}}
+                onClick={() => { navigate('/') }}
+                disabled={loading} // Disable if loading
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -113,22 +117,29 @@ const UploadPage = () => {
               </button>
 
               {/* Next Button */}
-              <button 
-                className="bg-[#D0FF71] text-black px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#D0FF20] active:scale-95 transition-transform duration-150"
+              <button
+                className={`bg-[#D0FF71] text-black px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-transform duration-150 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#D0FF20] active:scale-95'}`}
                 onClick={handleUpload}
+                disabled={loading} // Disable button when loading
               >
-                <span>Next</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3.536-3.536A9 9 0 0112 21a9 9 0 010-18z"></path>
+                    </svg>
+                    <span>Uploading...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <span>Next</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                )}
               </button>
+
             </div>
           </div>
         </div>

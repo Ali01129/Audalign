@@ -130,11 +130,21 @@ export default function MainContent() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isPlaying]);
 
+  const handleDownload = () => {
+    const a = document.createElement('a');
+    a.href = video;
+    a.download = 'audalign_processed_video.mp4';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  
+
   return (
     <section className="flex flex-col flex-1 max-sm:w-full h-screen">
       <header className="flex justify-between items-center p-4">
         <h1 className="text-base font-semibold text-white">Audalign Project</h1>
-        <button className="p-3 text-base font-semibold text-black bg-lime-300 rounded-lg cursor-pointer">
+        <button className="p-3 text-base font-semibold text-black bg-lime-300 rounded-lg cursor-pointer" onClick={handleDownload}>
           Export
         </button>
       </header>

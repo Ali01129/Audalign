@@ -45,12 +45,6 @@ export default function Sidebar() {
         isActive={navPressed === "Controls"} 
         onClick={() => setNavPressed("Controls")} 
       />
-      <NavItem 
-        icon={LayoutIcon} 
-        label="Layout" 
-        isActive={navPressed === "Layout"} 
-        onClick={() => setNavPressed("Layout")} 
-      />
     </aside>
   );
 }
