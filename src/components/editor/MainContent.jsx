@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Timeline from "./Timeline";
 import useGlobalStore from "../../zustand/store";
+import { useNavigate } from 'react-router-dom';
 import IconButton from "./IconButton";
 import {
   UndoIcon,
@@ -16,6 +17,7 @@ import {
 export default function MainContent() {
   const { video,setVideoRef } = useGlobalStore();
   const videoRef = useRef(null);
+  const navigate = useNavigate();
   const videoContainerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -137,6 +139,7 @@ export default function MainContent() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    navigate("/Upload");
   };
   
 
