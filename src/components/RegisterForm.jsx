@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import useGlobalStore from '../zustand/store';
 
 export default function RegisterForm() {
+  const { setLogedIn } = useGlobalStore();
   const navigate = useNavigate();
   
   // State to manage registration error message
@@ -14,13 +16,15 @@ export default function RegisterForm() {
   // Register function
   const registerUser = async (email, username, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/signup', {
-        name: username,
+      const response = await axios.post('http://127.0.0.1:5000/signup', {
+        username: username,
         email: email,
-        password: password
+        password: password,
+        confirm_password:password
       });
       setRegisterError(null);
       alert('Registration successful!');
+      setLogedIn(true);
       navigate('/Auth');
 
     } catch (error) {

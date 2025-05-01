@@ -5,9 +5,11 @@ import LoginButton from './LoginButton';
 import axios from 'axios';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import useGlobalStore from '../zustand/store';
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { setLogedIn } = useGlobalStore();
   
   // State to manage login error message
   const [loginError, setLoginError] = React.useState(null);
@@ -26,12 +28,13 @@ export default function LoginForm() {
   // Login function
   const loginUser = async (email, password, setErrors) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', {
+      const response = await axios.post('http://127.0.0.1:5000/login', {
         email: email,
         password: password
       });
       setLoginError(null);
       alert('Login successful!');
+      setLogedIn(true);
       navigate('/');
       // localStorage.setItem('token', response.data.token);
 
