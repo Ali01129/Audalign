@@ -5,6 +5,8 @@ const useGlobalStore = create((set) => ({
 
   //user info
   logedIn: false,
+  //audio
+  audio: null,
   //others
   volume:50,
   reverb:50,
@@ -12,12 +14,15 @@ const useGlobalStore = create((set) => ({
   noise:50,
   navPressed:'Media',
   video:null,
+  revertVideo:null,
   videoName:null,
   videoRef:null,
   loading:false,
 
   //user action
   setLogedIn: (logedIn) => set({ logedIn }),
+  //audio actions
+  setAudio: (audio) => set({ audio }),
   //other actions
   setVolume: (volume) => set({ volume }),
   setReverb: (reverb) => set({ reverb }),
@@ -25,6 +30,7 @@ const useGlobalStore = create((set) => ({
   setNoise: (noise) => set({ noise }),
   setNavPressed: (navPressed) => set({ navPressed }),
   setVideo: (video) => set({ video }),
+  setRevertVideo: (revertVideo) => set({ revertVideo }),
   setVideoName: (videoName) => set({ videoName }),
   setVideoRef: (videoRef) => set({ videoRef }),
   setLoading: (loading) => set({ loading }),

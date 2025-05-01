@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const UploadPage = () => {
 
-  const { setVideo, setVideoName } = useGlobalStore();
+  const { setVideo, setVideoName,setRevertVideo } = useGlobalStore();
 
   const [videoFile, setVideoFile] = useState(null);
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const UploadPage = () => {
 
         const videoUrl = URL.createObjectURL(response.data);
         setVideo(videoUrl);
-
+        setRevertVideo(videoUrl);
         navigate("/Editor");
       } catch (error) {
         console.error("Error uploading video:", error);
