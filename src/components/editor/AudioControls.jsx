@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import TabGroup from "./TabGroup";
 import Slider from "./Slider";
 import useGlobalStore from "../../zustand/store";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const tabs = [
   { id: "all", label: "All", isActive: true },
@@ -13,12 +14,16 @@ const tabs = [
 export default function AudioControls() {
   const { volume, setVolume, reverb, setReverb, pitch, setPitch, noise, setNoise,navPressed,videoName,audio,setAudio,video,setVideo,revertVideo } = useGlobalStore();
 
+  const navigate = useNavigate();
+
   const controls = [
     { id: "volume", label: "Volume", value: volume, setValue: setVolume },
     { id: "reverb", label: "Reverb", value: reverb, setValue: setReverb },
     { id: "pitch", label: "Pitch", value: pitch, setValue: setPitch },
     { id: "noise", label: "Noise reduction", value: noise, setValue: setNoise },
   ];
+  const [caLoading, setcaLoading] = useState(false);
+  const [sLoading, setsLoading] = useState(false);
 
   //handle audio upload
   const handleUploadAudio = () => {
@@ -47,13 +52,17 @@ export default function AudioControls() {
 
   //calling custom audio api
   const sendAudio = async () => {
-    if (!video || !audio) {
+    setcaLoading(true);
+    const response = await fetch(video);
+    const blob = await response.blob();
+    const file = new File([blob], "video.mp4", { type: "video/mp4" });
+    if (!file || !audio) {
       alert("Video or audio file is missing");
       return;
     }
   
     const formData = new FormData();
-    formData.append("video", video);
+    formData.append("video", file);
     formData.append("audio", audio);
   
     try {
@@ -73,8 +82,10 @@ export default function AudioControls() {
   
       // Reload the page after a short delay to ensure state is updated
       setTimeout(() => {
-        window.location.reload();
+        navigate("/Editor");
       }, 500);
+      setcaLoading(false);
+      setAudio(null);
   
     } catch (error) {
       if (error.response?.data) {
@@ -88,8 +99,10 @@ export default function AudioControls() {
           }
         };
         reader.readAsText(error.response.data);
+        setcaLoading(false);
       } else {
         alert("Upload failed: " + error.message);
+        setcaLoading(false);
       }
     }
   };  
@@ -101,18 +114,22 @@ export default function AudioControls() {
     setPitch(50);
     setNoise(50);
     setTimeout(() => {
-      window.location.reload();
+      navigate("/Editor");
     }, 500);
   }
   
   //calling slider api
   const handleSubmitSliders=async () => {
-    if (!video) {
+    setsLoading(true);
+    const response = await fetch(video);
+    const blob = await response.blob();
+    const file = new File([blob], "video.mp4", { type: "video/mp4" });
+    if (!file) {
       alert("Video or audio file is missing");
       return;
     }
     const formData = new FormData();
-    formData.append("video", video);
+    formData.append("video", file);
     formData.append("volume", volume);
     formData.append("pitch", pitch);
     formData.append("reverb", reverb);
@@ -123,15 +140,13 @@ export default function AudioControls() {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      // const videoBlob = new Blob([response.data], { type: "video/mp4" });
-      // const videoURL = URL.createObjectURL(videoBlob);
       const videoURL = URL.createObjectURL(response.data);
       setVideo(videoURL);
 
-      // Delay reload to allow React to render updated state
       setTimeout(() => {
-        window.location.reload();
-      }, 1000); // 1 second delay
+        navigate("/Editor");
+      }, 1000);
+      setsLoading(false);
     } catch (error) {
       if (error.response && error.response.data) {
         const reader = new FileReader();
@@ -140,9 +155,11 @@ export default function AudioControls() {
           alert(`Error: ${err.error}`);
         };
         reader.readAsText(error.response.data);
+        setsLoading(false);
       } else {
         console.error("Unexpected error:", error);
         alert("An unexpected error occurred.");
+        setsLoading(false);
       }
     }
   };
@@ -177,10 +194,26 @@ export default function AudioControls() {
             <>
               <h4 className="text-base font-semibold text-white">{audio.name}</h4>
               <button
-                className="w-full p-3 mb-4 mt-4 text-base font-semibold text-center text-black bg-lime-300 rounded-lg cursor-pointer"
+                className={`w-full p-3 mb-4 mt-4 text-base font-semibold text-center text-black bg-lime-300 rounded-lg cursor-pointer flex items-center justify-center space-x-2 transition-transform duration-150 ${caLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-lime-200 active:scale-95'}`}
                 onClick={sendAudio}
+                disabled={caLoading}
               >
-                Apply
+                {caLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3.536-3.536A9 9 0 0112 21a9 9 0 010-18z"></path>
+                    </svg>
+                    <span>Applying...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <span>Apply</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                )}
               </button>
             </>
           )}
@@ -206,8 +239,27 @@ export default function AudioControls() {
             ))}
           </div>
 
-          <button className="p-3 mt-8 text-base font-semibold text-center text-black bg-lime-300 rounded-lg cursor-pointer" onClick={handleSubmitSliders}>
-            Apply
+          <button
+            className={`p-3 mt-8 text-base font-semibold text-center text-black bg-lime-300 rounded-lg cursor-pointer flex items-center justify-center space-x-2 transition-transform duration-150 ${sLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-lime-200 active:scale-95'}`}
+            onClick={handleSubmitSliders}
+            disabled={sLoading}
+          >
+            {sLoading ? (
+              <div className="flex items-center space-x-2">
+                <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3.536-3.536A9 9 0 0112 21a9 9 0 010-18z" />
+                </svg>
+                <span>Applying...</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <span>Apply</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            )}
           </button>
         </>
       )}

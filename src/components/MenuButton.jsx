@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGlobalStore from '../zustand/store';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +55,15 @@ const Menu = () => {
                   if (menuItem.onClick) {
                     menuItem.onClick();
                   } else {
-                    navigate(menuItem.link);
+                    if(menuItem.link === '/Upload' && logedIn) {
+                      navigate(menuItem.link);
+                    }
+                    else if(menuItem.link === '/Upload' && !logedIn){
+                      toast.error('Login First to use this functionality!');
+                    }
+                    else {
+                      navigate(menuItem.link);
+                    }
                   }
                 }}
               >

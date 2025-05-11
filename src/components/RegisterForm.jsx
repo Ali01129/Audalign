@@ -5,6 +5,8 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import useGlobalStore from '../zustand/store';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function RegisterForm() {
   const { setLogedIn } = useGlobalStore();
@@ -17,19 +19,23 @@ export default function RegisterForm() {
   const registerUser = async (email, username, password) => {
     try {
       const response = await axios.post('http://127.0.0.1:5000/signup', {
-        username: username,
-        email: email,
-        password: password,
-        confirm_password:password
+        username,
+        email,
+        password,
+        confirm_password: password
       });
-      setRegisterError(null);
-      alert('Registration successful!');
-      setLogedIn(true);
-      navigate('/Auth');
 
+      setRegisterError(null);
+      setLogedIn(true);
+      toast.success('Registration successful! Please login.');
+      navigate('/Auth');
+      
     } catch (error) {
-      // On failure, show error message
-      setRegisterError('Error: Could not register. Please try again.');
+      if (error.response && error.response.data && error.response.data.error) {
+        setRegisterError(error.response.data.error);
+      } else {
+        setRegisterError('Error: Could not register. Please try again.');
+      }
     }
   };
 

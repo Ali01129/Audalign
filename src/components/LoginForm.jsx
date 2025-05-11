@@ -6,6 +6,8 @@ import axios from 'axios';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import useGlobalStore from '../zustand/store';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -29,17 +31,20 @@ export default function LoginForm() {
   const loginUser = async (email, password, setErrors) => {
     try {
       const response = await axios.post('http://127.0.0.1:5000/login', {
-        email: email,
-        password: password
+        email,
+        password
       });
-      setLoginError(null);
-      alert('Login successful!');
-      setLogedIn(true);
-      navigate('/');
-      // localStorage.setItem('token', response.data.token);
 
+      setLoginError(null);
+      setLogedIn(true);
+      toast.success('Login successful!');
+      navigate('/');
     } catch (error) {
-      setLoginError('Invalid email or password. Please try again.');
+      if (error.response && error.response.data && error.response.data.error) {
+        setLoginError(error.response.data.error);
+      } else {
+        setLoginError('An unexpected error occurred. Please try again.');
+      }
       setErrors({});
     }
   };

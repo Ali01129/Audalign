@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { SocialIcon } from '../components/SocialIcon';
 import { ContactInfo } from '../components/ContactInfo';
 import MenuButton from '../components/MenuButton';
+import useGlobalStore from "../zustand/store";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const socialIcons = [
   { src: "https://cdn.builder.io/api/v1/image/assets/5c70ca3f18714fc893785ac3990400f6/a97d3f1bb65b75eacbff767f983133cd89f72ae1e49bd7c92f2806e87c5bf810?apiKey=5c70ca3f18714fc893785ac3990400f6&", alt: "Social Media Icon 1" },
@@ -30,6 +34,7 @@ const contactInfo = [
 ];
 
 export default function LandingPage() {
+  const { logedIn } = useGlobalStore();
   const navigate = useNavigate();
   return (
     <div className="flex overflow-hidden flex-col bg-white">
@@ -42,7 +47,14 @@ export default function LandingPage() {
                 Transform Your Table Tennis Videos with Realistic Foley Sounds!
               </div>
               <button className="gap-2.5 px-5 py-5 mt-14 bg-lime-300 min-h-[61px] rounded-[30px] max-md:mt-10 active:scale-95 transition-transform duration-150" 
-              onClick={()=>{navigate('/Upload')}}>
+              onClick={()=>{
+                if(logedIn){
+                navigate('/Upload')
+                }
+                else{
+                  toast.error('Login First to use this functionality!');
+                }
+                }}>
                 Upload a Video
               </button>
               <div className="mt-20 text-6xl text-white max-md:mt-10 max-md:text-4xl">
