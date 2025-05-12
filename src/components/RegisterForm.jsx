@@ -26,7 +26,7 @@ export default function RegisterForm() {
       });
 
       setRegisterError(null);
-      setLogedIn(true);
+      // setLogedIn(true);
       toast.success('Registration successful! Please login.');
       navigate('/Auth');
       
